@@ -1,4 +1,4 @@
-(ns examples.core
+(ns anglican-infcomp-examples.core
   (:gen-class)
   (:require [clojure.edn :as edn]
             [clojure.tools.cli :as cli]

@@ -1,3 +1,11 @@
+/.lein-*
+/.nrepl-port
+.hgignore
+.hg/
+.gorilla-port
+tmp.png
+*DS_Store
+
 pom.xml
 pom.xml.asc
 *.jar
