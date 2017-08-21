@@ -20,8 +20,6 @@
             anglican.infcomp.csis
             anglican.importance
             anglican.infcomp.core))
-
-(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-unkown'>#function[anglican.infcomp.core/reset-infcomp-addressing-scheme!$fn--26877$fn--26878]</span>","value":"#function[anglican.infcomp.core/reset-infcomp-addressing-scheme!$fn--26877$fn--26878]"}
@@ -32,6 +30,7 @@
 ;; **
 
 ;; @@
+(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 (defquery uniform-continuous-query [obs]
   (let [uc-min (sample (normal 0 0.1))
         uc-range (sample (normal 10 0.1))

@@ -20,8 +20,6 @@
   (:use [anglican emit runtime]
         [gorilla-plot core]
         [gorilla-repl image]))
-
-(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-unkown'>#function[anglican.infcomp.core/reset-infcomp-addressing-scheme!$fn--27296$fn--27297]</span>","value":"#function[anglican.infcomp.core/reset-infcomp-addressing-scheme!$fn--27296$fn--27297]"}
@@ -105,6 +103,7 @@
     {:edges edges
      :probs probs}))
 
+(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 (with-primitive-procedures [normalize]
   (defquery pdfa [observedsequence alphabet]
     (let [num-states (sample (categorical [[2 10] [3 6] [4 3] [5 1]]))

@@ -1,13 +1,13 @@
 (ns examples.core
   (:gen-class)
-  (:refer-clojure :exclude [read-string])
-  (:require [clojure.edn :refer [read-string]]
+  (:require [clojure.edn :as edn]
             [clojure.tools.cli :as cli]
             [clojure.string :as str]
-            anglican.infcomp.csis
-            [anglican.infcomp.network :refer :all]
+            [anglican.infcomp.pool :as pool]
+            [anglican.infcomp.zmq :as zmq]
             [anglican.inference :refer [infer]]
-            [anglican.state :refer [get-result get-log-weight]]))
+            [anglican.state :refer [get-result get-log-weight]]
+            anglican.infcomp.csis))
 
 (defn load-var
   "loads a variable from clojure namespace"
@@ -29,8 +29,21 @@
    ["-q" "--query <string>" "Name of the query"]
 
    ;; Compile options
-   ["-t" "--compile-tcp-endpoint <tcp>" "COMPILE: TCP endpoint"
+   ["-t" "--compile-endpoint <endpoint>" "COMPILE: endpoint"
     :default "tcp://*:5555"]
+
+   ["-p" "--pool" "COMPILE: Pool"]
+
+   ["-f" "--pool-folder <string>" "COMPILE: Pool folder"
+    :default "./"]
+
+   ["-r" "--pool-traces-per-file <int>" "COMPILE: Traces per file for pool"
+    :default 1000
+    :parse-fn #(Integer/parseInt %)]
+
+   ["-z" "--pool-max-folder-size <int>" "COMPILE: Maximum folder size for pool in bytes"
+    :default 1000
+    :parse-fn #(Integer/parseInt %)]
 
    ["-o" "--compile-combine-observes-fn <variable name>" "COMPILE: Name of a function to combine observes"]
 
@@ -39,25 +52,27 @@
    ["-a" "--compile-query-args <variable name>" "COMPILE: Name of the variable storing the query arguments for compilation"]
 
    ["-x" "--compile-query-args-value <clojure value>" "COMPILE: Query arguments for compilation"
-    :parse-fn read-string]
+    :parse-fn edn/read-string]
 
    ;; Infer options
    ["-N" "--infer-number-of-samples <int>" "INFER: Number of samples to output"
     :default 1
     :parse-fn #(Integer/parseInt %)]
 
-   ["-T" "--infer-tcp-endpoint <tcp>" "INFER: TCP endpoint"
+   ["-T" "--infer-endpoint <endpoint>" "INFER: Endpoint"
     :default "tcp://localhost:6666"]
 
    ["-E" "--infer-observe-embedder-input <variable name>" "INFER: Name of the variable storing the input to the observe embedder"]
 
    ["-Y" "--infer-observe-embedder-input-value <clojure value>" "INFER: Input to the observe embedder"
-    :parse-fn read-string]
+    :parse-fn edn/read-string]
 
    ["-A" "--infer-query-args <variable name>" "INFER: Name of the variable storing the query arguments for inference"]
 
    ["-Z" "--infer-query-args-value <value>" "INFER: Query arguments for inference"
-    :parse-fn read-string]])
+    :parse-fn edn/read-string]
+
+   ["-d" "--debug" "debug"]])
 
 (defn usage [summary]
   (str "Usage:
@@ -111,9 +126,6 @@ lein run -- \\
      errors (binding [*out* *err*]
               (println (error-msg errors)))
 
-     ;; Further checks
-     ;; ...
-
      :else
      (try
        ;; Load the query.
@@ -132,30 +144,66 @@ lein run -- \\
                  query-args (if (:compile-query-args options)
                               (load-var ns-name (:compile-query-args options))
                               (:compile-query-args-value options))
-                 tcp-endpoint (:compile-tcp-endpoint options)]
-             (println
-              (format (str ";; Namespace:                     %s\n"
-                           ";; Query:                         %s\n"
-                           ";; Mode:                          compile (server: %s)\n"
-                           ";; Combine observes function:     %s\n"
-                           ";; Combine samples function:      %s\n"
-                           ";; Compile query arguments:       %s\n"
-                           ";; Compile query arguments value: %s\n")
-                      ns-name
-                      query-name
-                      tcp-endpoint
-                      (or (:compile-combine-observes-fn options) "default: (fn [observes] (:value (first observes)))")
-                      (or (:compile-combine-samples-fn options) "default: identity")
-                      (or (:compile-query-args options) "default: nil")
-                      (if query-args
-                        (str (apply str (take 77 (str query-args))) "...")
-                        "nil")))
-             (start-torch-connection query
-                                     query-args
-                                     combine-observes-fn
-                                     :tcp-endpoint tcp-endpoint
-                                     :combine-samples-fn combine-samples-fn)
-             (println (str "Compilation server started at " tcp-endpoint "...")))
+                 pool (:pool options)
+                 pool-folder (:pool-folder options)
+                 pool-traces-per-file (:pool-traces-per-file options)
+                 pool-max-folder-size (:pool-max-folder-size options)
+                 endpoint (:compile-endpoint options)]
+             (if pool
+               (do
+                 (println
+                  (format (str ";; Namespace:                     %s\n"
+                               ";; Query:                         %s\n"
+                               ";; Mode:                          compile (pool) \n"
+                               ";; Combine observes function:     %s\n"
+                               ";; Combine samples function:      %s\n"
+                               ";; Compile query arguments:       %s\n"
+                               ";; Compile query arguments value: %s\n"
+                               ";; Pool folder:                   %s\n"
+                               ";; Traces per file:               %s\n"
+                               ";; Maximum folder size (bytes)    %s\n")
+                          ns-name
+                          query-name
+                          (or (:compile-combine-observes-fn options) "default: (fn [observes] (:value (first observes)))")
+                          (or (:compile-combine-samples-fn options) "default: identity")
+                          (or (:compile-query-args options) "default: nil")
+                          (if query-args
+                            (str (apply str (take 77 (str query-args))) "...")
+                            "nil")
+                          pool-folder
+                          pool-traces-per-file
+                          pool-max-folder-size))
+                 (pool/start-pool query
+                                  query-args
+                                  combine-observes-fn
+                                  pool-folder
+                                  :combine-samples-fn combine-samples-fn
+                                  :traces-per-file pool-traces-per-file
+                                  :max-folder-size pool-max-folder-size)
+                 (println (str "Started generating a pool of training data in " pool-folder)))
+               (do
+                 (println
+                  (format (str ";; Namespace:                     %s\n"
+                               ";; Query:                         %s\n"
+                               ";; Mode:                          compile \n"
+                               ";; Combine observes function:     %s\n"
+                               ";; Combine samples function:      %s\n"
+                               ";; Compile query arguments:       %s\n"
+                               ";; Compile query arguments value: %s\n")
+                          ns-name
+                          query-name
+                          (or (:compile-combine-observes-fn options) "default: (fn [observes] (:value (first observes)))")
+                          (or (:compile-combine-samples-fn options) "default: identity")
+                          (or (:compile-query-args options) "default: nil")
+                          (if query-args
+                            (str (apply str (take 77 (str query-args))) "...")
+                            "nil")))
+                 (zmq/start-replier query
+                                    query-args
+                                    combine-observes-fn
+                                    :combine-samples-fn combine-samples-fn
+                                    :endpoint endpoint)
+                 (println (str "Compilation server started at " endpoint)))))
 
            ;; Infer
            (let [query-args (if (:infer-query-args options)
@@ -164,12 +212,12 @@ lein run -- \\
                  observe-embedder-input (if (:infer-observe-embedder-input options)
                                           (load-var ns-name (:infer-observe-embedder-input options))
                                           (:infer-observe-embedder-input-value options))
-                 tcp-endpoint (:infer-tcp-endpoint options)
+                 endpoint (:infer-endpoint options)
                  num-samples (:infer-number-of-samples options)
                  states (infer :csis
                                query
                                query-args
-                               :tcp-endpoint tcp-endpoint
+                               :endpoint endpoint
                                :observe-embedder-input observe-embedder-input)]
              (println
               (format (str ";; Namespace:                    %s\n"
@@ -182,7 +230,7 @@ lein run -- \\
                            ";; Number of samples:            %s\n")
                       ns-name
                       query-name
-                      tcp-endpoint
+                      endpoint
                       (or (:infer-query-args options) "nil")
                       (if query-args
                         (str (apply str (take 77 (str query-args))) "...")
@@ -197,9 +245,7 @@ lein run -- \\
        ;; Otherwise, could not load the query.
        (catch Exception e
          (binding [*out* *err*]
-           (println
-            (format "ERROR loading query '%s/%s':\n\t%s"
-                    (:namespace options) (:query options) e))
+           (println e)
            (when (:debug options)
              (.printStackTrace e))))))))
 

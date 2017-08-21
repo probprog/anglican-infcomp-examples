@@ -26,8 +26,6 @@
   (:import [robots.OxCaptcha OxCaptcha]
            [javax.imageio ImageIO]
            [java.io File]))
-
-(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-unkown'>#function[anglican.infcomp.core/reset-infcomp-addressing-scheme!$fn--27313$fn--27314]</span>","value":"#function[anglican.infcomp.core/reset-infcomp-addressing-scheme!$fn--27313$fn--27314]"}
@@ -52,6 +50,7 @@
 (def lo 0.0008)
 (def hi 0.0025)
 
+(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 (with-primitive-procedures [normalize m/mmul m/identity-matrix sample-discrete sort-means-vars]
   (defquery gmm [data hyperparameters]
     (let [num-clusters (sample (uniform-discrete 1 6))

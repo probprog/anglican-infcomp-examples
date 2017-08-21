@@ -1,7 +1,10 @@
 (ns queries.captcha-facebook
   (:require [anglican.runtime :refer :all]
             [anglican.emit :refer [defquery with-primitive-procedures]]
-            [helpers.captcha-facebook :refer [render abc-dist abc-sigma letter-dict]]))
+            [helpers.captcha-facebook :refer [render abc-dist abc-sigma letter-dict]]
+            anglican.infcomp.core))
+
+(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 
 (with-primitive-procedures [render abc-dist repeatedly]
   (defquery captcha-facebook [baseline-image]

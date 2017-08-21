@@ -16,8 +16,6 @@
             anglican.infcomp.csis
             anglican.importance
             anglican.infcomp.core))
-
-(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-unkown'>#function[anglican.infcomp.core/reset-infcomp-addressing-scheme!$fn--26896$fn--26897]</span>","value":"#function[anglican.infcomp.core/reset-infcomp-addressing-scheme!$fn--26896$fn--26897]"}
@@ -52,6 +50,7 @@
           bound (/ (unnormalized-target-density maximizer) (unnormalized-proposal-density maximizer))]
       (rejection-sample unnormalized-target-density unnormalized-proposal-density proposal-sampler bound))))
 
+(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 (defquery q []
   (rejection-sample-gaussian 0 1 0 2))
 

@@ -1,7 +1,10 @@
 (ns queries.captcha-wikipedia
   (:require [anglican.runtime :refer :all]
             [anglican.emit :refer [defquery with-primitive-procedures]]
-            [helpers.captcha-wikipedia :refer [render abc-dist abc-sigma letter-dict]]))
+            [helpers.captcha-wikipedia :refer [render abc-dist abc-sigma letter-dict]]
+            anglican.infcomp.core))
+
+(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 
 (with-primitive-procedures [render abc-dist repeatedly]
   (defquery captcha-wikipedia [baseline-image]

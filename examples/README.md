@@ -23,13 +23,13 @@ lein run -- \
 
 Then run the following to train the neural network:
 ```
-python -m infcomp.compile
+python -m pyprob.compile
 ```
 
 ### Inference
 Start the inference server:
 ```
-python -m infcomp.infer
+python -m pyprob.infer
 ```
 
 Then run inference:
@@ -37,7 +37,8 @@ Then run inference:
 lein run -- \
 --mode infer \
 --namespace queries.gaussian \
---infer-query-args-value [2.3]
+--infer-query-args-value [2.3] \
+--infer-number-of-samples 10
 ```
 
 ## 2. Gaussian Mixture Model with fixed number of clusters
@@ -56,8 +57,8 @@ lein run -- \
 
 Then run the following to train the neural network:
 ```
-python -m infcomp.compile \
---obsEmb cnn6 \
+python -m pyprob.compile \
+--obsEmb cnn2d6c \
 --obsEmbDim 20 \
 --lstmDim 20 \
 ```
@@ -65,7 +66,7 @@ python -m infcomp.compile \
 ### Inference
 Start the inference server:
 ```
-python -m infcomp.infer
+python -m pyprob.infer
 ```
 
 Then run inference:
@@ -93,8 +94,8 @@ lein run -- \
 
 Then run the following to train the neural network:
 ```
-python -m infcomp.compile \
---obsEmb cnn6 \
+python -m pyprob.compile \
+--obsEmb cnn2d6c \
 --obsEmbDim 256 \
 --lstmDim 256
 ```
@@ -102,7 +103,7 @@ python -m infcomp.compile \
 ### Inference
 Start the inference server:
 ```
-python -m infcomp.infer
+python -m pyprob.infer
 ```
 
 Then run inference:
@@ -129,8 +130,8 @@ lein run -- \
 
 Then run the following to train the neural network:
 ```
-python -m infcomp.compile \
---obsEmb cnn6 \
+python -m pyprob.compile \
+--obsEmb cnn2d6c \
 --obsEmbDim 1024 \
 --lstmDim 512
 ```
@@ -138,7 +139,7 @@ python -m infcomp.compile \
 ### Inference
 Start the inference server:
 ```
-python -m infcomp.infer
+python -m pyprob.infer
 ```
 
 Then run inference:
@@ -162,8 +163,8 @@ lein run -- \
 
 Then run the following to train the neural network:
 ```
-python -m infcomp.compile \
---obsEmb cnn6 \
+python -m pyprob.compile \
+--obsEmb cnn2d6c \
 --obsEmbDim 1024 \
 --lstmDim 512
 ```
@@ -171,7 +172,7 @@ python -m infcomp.compile \
 ### Inference
 Start the inference server:
 ```
-python -m infcomp.infer
+python -m pyprob.infer
 ```
 
 Then run inference:
@@ -185,7 +186,7 @@ lein run -- \
 ## 6. Gorilla REPL Notebooks
 [Gorilla REPL][gorilla-repl-link] is a Jupyter-like, notebook-style Clojure REPL. All above examples have a corresponding Gorilla REPL version. To open the notebooks, run
 ```
-$ lein gorilla
+lein gorilla
 ```
 and open the link shown. To load a worksheet, click the button on the top-right corner and select *Load a worksheet*. Then, use *Shift+Enter* to successively evaluate the code blocks.
 

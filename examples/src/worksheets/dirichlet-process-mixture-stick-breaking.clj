@@ -22,8 +22,6 @@
             [anglican.inference :refer [infer]]
             [helpers.gmm :refer [normalize move-to-unit-box gridify]]
             [gorilla-plot.core :as plt]))
-
-(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-unkown'>#function[anglican.infcomp.core/reset-infcomp-addressing-scheme!$fn--27296$fn--27297]</span>","value":"#function[anglican.infcomp.core/reset-infcomp-addressing-scheme!$fn--27296$fn--27297]"}
@@ -34,6 +32,7 @@
 ;; **
 
 ;; @@
+(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 (defm create-sethuraman-stick-breaking-process
   [concentration]
   (let

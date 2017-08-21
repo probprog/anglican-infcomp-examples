@@ -3,7 +3,8 @@
             [anglican.emit :refer [defquery with-primitive-procedures]]
             [clojure.core.matrix :as m]
             [clojure.core.matrix.linear :as mlin]
-            [helpers.gmm :refer [normalize move-to-unit-box gridify]]))
+            [helpers.gmm :refer [normalize move-to-unit-box gridify]]
+            anglican.infcomp.core))
 
 ;; These are the hyperparameters for the model:
 ;; mu0		mean for the Gaussian prior over the cluster means
@@ -15,6 +16,7 @@
 (defn sample-discrete [probs]
   (sample* (discrete probs)))
 
+(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 (with-primitive-procedures [normalize m/mmul m/identity-matrix sample-discrete mlin/norm]
   (defquery gmm-fixed-number-of-clusters [data hyperparameters]
     (let [num-clusters 3

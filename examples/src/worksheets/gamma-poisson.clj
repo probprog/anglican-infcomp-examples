@@ -7,21 +7,6 @@
 ;; @@
 (ns worksheets.gamma-poisson
   (:require [anglican.runtime :refer :all]
-            [anglican.emit :refer [defquery]]
-            [anglican.stat :refer [empirical-distribution collect-results]]
-            anglican.infcomp.csis
-            anglican.importance
-            [anglican.infcomp.network :refer :all]
-            [anglican.inference :refer [infer]])
-  (:use [gorilla-plot core]))
-;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
-;; <=
-
-;; @@
-(ns worksheets.gamma-poisson
-  (:require [anglican.runtime :refer :all]
             [anglican.emit :refer :all]
             [anglican.stat :as stat]
             [anglican.infcomp.zmq :as zmq]
@@ -31,8 +16,6 @@
             anglican.infcomp.csis
             anglican.importance
             anglican.infcomp.core))
-
-(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-unkown'>#function[anglican.infcomp.core/reset-infcomp-addressing-scheme!$fn--27296$fn--27297]</span>","value":"#function[anglican.infcomp.core/reset-infcomp-addressing-scheme!$fn--27296$fn--27297]"}
@@ -43,6 +26,7 @@
 ;; **
 
 ;; @@
+(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 (defquery gamma-poisson [observations]
   (let [poisson-rate (sample (gamma 2 0.5))]
     (doall (map #(observe (poisson poisson-rate) %) observations))

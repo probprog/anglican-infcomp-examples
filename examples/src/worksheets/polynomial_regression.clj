@@ -20,8 +20,6 @@
             [anglican.infcomp.prior :as prior]
             [anglican.inference :refer [infer]])
   (:use [gorilla-plot core]))
-
-(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-unkown'>#function[anglican.infcomp.core/reset-infcomp-addressing-scheme!$fn--27296$fn--27297]</span>","value":"#function[anglican.infcomp.core/reset-infcomp-addressing-scheme!$fn--27296$fn--27297]"}
@@ -35,6 +33,7 @@
 (defn poly [w x]
   (reduce #(-> %1 (* x) (+ %2)) (reverse w)))
 
+(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 (with-primitive-procedures [poly]
   (defquery polynomial-regression [inputs outputs]
     (let [w0 (sample "w0" (laplace 0 2))
