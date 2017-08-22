@@ -87,11 +87,16 @@ def main():
     # Plot inference_{dataset_num}_{num_particles}.pdf
     for dataset_num in args.dataset_num_list:
         for num_particles in args.num_particles_list:
-            fig, axs = plt.subplots(len(args.algorithms) + 1, 1)
-            fig.set_size_inches(8, 10)
+            fig = plt.figure()
             fig.suptitle('{} particle{}'.format(
                 num_particles, '' if num_particles == 1 else 's'
-            ), fontsize=14)
+            ), fontsize=14, x=0.4, horizontalalignment='center')
+
+            gs = matplotlib.gridspec.GridSpec(len(args.algorithms) + 1, 2)
+            axs = [plt.subplot(gs[i, :-1])
+                   for i in range(len(args.algorithms) + 1)]
+            colorbar_ax = plt.subplot(gs[:, -1], aspect=50)
+
             temp = axs[0].imshow(
                 true_posteriors[dataset_num],
                 clim=[0, 1], cmap=matplotlib.cm.Blues
@@ -113,7 +118,12 @@ def main():
 
             axs[-1].set_xticks(np.arange(len(data[dataset_num])))
             axs[-1].set_xlabel('Time')
-            cbar = fig.colorbar(temp, ax=axs[-1], orientation='horizontal')
+            fig.colorbar(
+                temp, cax=colorbar_ax, orientation='vertical', ticks=[0, 1]
+            )
+
+            fig.tight_layout()
+            gs.tight_layout(fig, rect=[0, 0, 1, 0.95])
 
             filename = 'inference_{0}_{1}.pdf'.format(
                 dataset_num, num_particles
