@@ -183,6 +183,68 @@ def main():
         fig.savefig(filename, bbox_inches='tight')
         print('\nPlot saved to {}'.format(filename))
 
+    # Plot log_kl_{dataset_num}.pdf
+    for dataset_num in args.dataset_num_list:
+        fig, ax = plt.subplots(1, 1)
+        fig.suptitle('Sum of KL divergences\n{} particle{}'.format(
+            num_particles, '' if num_particles == 1 else 's'
+        ), fontsize=14)
+        kls = {}
+        for algorithm in args.algorithms:
+            kls[algorithm] = []
+            for num_particles in args.num_particles_list:
+                kls[algorithm].append(get_sum_kl(
+                    true_posteriors[dataset_num],
+                    posteriors[dataset_num][num_particles][algorithm]
+                ))
+
+            ax.loglog(args.num_particles_list, kls[algorithm], label=algorithm)
+
+        ax.legend()
+        ax.set_xlabel('Number of particles')
+        ax.set_ylabel(
+            '$\sum_{t = 1}^T KL(p(x_t | y_{1:T}) || \hat p(x_t | y_{1:T}))$'
+        )
+        # ax.set_xticks(args.num_particles_list)
+        ax.set_xlim(
+            np.min(args.num_particles_list), np.max(args.num_particles_list)
+        )
+
+        filename = 'log_kl_{}.pdf'.format(dataset_num)
+        fig.savefig(filename, bbox_inches='tight')
+        print('\nPlot saved to {}'.format(filename))
+
+    # Plot log_l2_{dataset_num}.pdf
+    for dataset_num in args.dataset_num_list:
+        fig, ax = plt.subplots(1, 1)
+        fig.suptitle('Sum of L2 norms\n{} particle{}'.format(
+            num_particles, '' if num_particles == 1 else 's'
+        ), fontsize=14)
+        l2s = {}
+        for algorithm in args.algorithms:
+            l2s[algorithm] = []
+            for num_particles in args.num_particles_list:
+                l2s[algorithm].append(get_sum_l2(
+                    true_posteriors[dataset_num],
+                    posteriors[dataset_num][num_particles][algorithm]
+                ))
+
+            ax.loglog(args.num_particles_list, l2s[algorithm], label=algorithm)
+
+        ax.legend()
+        ax.set_xlabel('Number of particles')
+        ax.set_ylabel(
+            '$\sum_{t = 1}^T L_2(p(x_t | y_{1:T}), \hat p(x_t | y_{1:T}))$'
+        )
+        # ax.set_xticks(args.num_particles_list)
+        ax.set_xlim(
+            np.min(args.num_particles_list), np.max(args.num_particles_list)
+        )
+
+        filename = 'log_l2_{}.pdf'.format(dataset_num)
+        fig.savefig(filename, bbox_inches='tight')
+        print('\nPlot saved to {}'.format(filename))
+
 
 if __name__ == '__main__':
     main()

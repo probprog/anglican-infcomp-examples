@@ -62,7 +62,7 @@
   (def init-dist init-dist)
   (def trans-dists trans-dists)
   (def obs-dists obs-dists)
-  (def particles-range [1 2 3 4 5]))
+  (def particles-range [1 10 100 1000 10000]))
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/particles-range</span>","value":"#'worksheets.hmm/particles-range"}
@@ -86,16 +86,10 @@ observations
         nicely-formatted-results (str/join "\n" formatted-lines)]
     (spit (str/join ["plots/hmm/is_1_" (str num-particles) ".csv"]) nicely-formatted-results)))
 ;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/getImportanceResults</span>","value":"#'worksheets.hmm/getImportanceResults"}
-;; <=
 
 ;; @@
 (map getImportanceResults particles-range)
 ;; @@
-;; =>
-;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}],"value":"(nil nil nil nil nil)"}
-;; <=
 
 ;; @@
 (defn getSMCResults [ num-particles ]
@@ -104,16 +98,10 @@ observations
         nicely-formatted-results (str/join "\n" formatted-lines)]
     (spit (str/join ["plots/hmm/smc_1_" (str num-particles) ".csv"]) nicely-formatted-results)))
 ;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/getSMCResults</span>","value":"#'worksheets.hmm/getSMCResults"}
-;; <=
 
 ;; @@
 (map getSMCResults particles-range)
 ;; @@
-;; =>
-;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}],"value":"(nil nil nil nil nil)"}
-;; <=
 
 ;; **
 ;;; Start the compiler:
@@ -141,10 +129,6 @@ observations
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-string'>&quot;ZMQ connection terminated.&quot;</span>","value":"\"ZMQ connection terminated.\""}
 ;; <=
-
-;; @@
-(infer :csis hmm [observations init-dist trans-dists obs-dists])
-;; @@
 
 ;; @@
 (defn getCSISResults [num-particles]
