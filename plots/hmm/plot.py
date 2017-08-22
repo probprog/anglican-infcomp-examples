@@ -34,7 +34,11 @@ def get_posterior(inference_result, num_states):
 
 
 def get_sum_kl(posterior_1, posterior_2, epsilon=1e-10):
-    return np.sum(posterior_1 * (np.log(posterior_1 + epsilon) - np.log(posterior_2 + epsilon)))
+    return np.sum(
+        posterior_1 * (
+            np.log(posterior_1 + epsilon) - np.log(posterior_2 + epsilon)
+        )
+    )
 
 
 def get_sum_l2(posterior_1, posterior_2):
