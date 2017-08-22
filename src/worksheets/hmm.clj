@@ -1,5 +1,9 @@
 ;; gorilla-repl.fileformat = 1
 
+;; **
+;;; # Hidden Markov model
+;; **
+
 ;; @@
 (ns worksheets.hmm
   (:require [anglican.runtime :refer :all]
@@ -25,17 +29,16 @@
 
 ;; @@
 (anglican.infcomp.core/reset-infcomp-addressing-scheme!)
-
-( defquery hmm
-	[ observations init-dist trans-dists obs-dists ]
-	( reduce
-			( fn [ states obs ]
-				( let [ state ( sample ( get trans-dists
-											( peek states )))]
-					( observe ( get obs-dists state ) obs )
-					( conj states state )))
-				[( sample init-dist )]
-				observations ))
+(defquery hmm [observations init-dist trans-dists obs-dists]
+  (reduce
+    (fn [states obs]
+      (let [state (if (empty? states)
+                    (sample init-dist)
+                    (sample (get trans-dists (peek states))))]
+        (observe (get obs-dists state) obs)
+        (conj states state)))
+    []
+    observations))
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/hmm</span>","value":"#'worksheets.hmm/hmm"}
@@ -48,24 +51,18 @@
 ;; @@
 (let [spec (slurp "plots/hmm/model.csv")
       spec (str/split spec #"\n")
-  	  spec (into [] (map #(str/split % #",") spec))
-      
+      spec (into [] (map #(str/split % #",") spec))
+
       init-dist (categorical (map #(vector %1 %2) (range) (map read-string (get spec 0))))
-      
       trans-probs [(into [] (map read-string (get spec 1))) (into [] (map read-string (get spec 2))) (into [] (map read-string (get spec 3)))]
       trans-dists (into [] (map (fn [probs] (categorical (map #(vector %1 %2) (range) probs))) trans-probs))
-      
       obs-dists (into [] (map #(normal %1 %2) (map read-string (get spec 4)) (map read-string (get spec 5))))
-      
-      observations (map read-string (str/split (slurp "plots/hmm/data_1.csv") #","))
-      ]
-  
+      observations (map read-string (str/split (slurp "plots/hmm/data_1.csv") #","))]
   (def observations observations)
   (def init-dist init-dist)
   (def trans-dists trans-dists)
   (def obs-dists obs-dists)
-  (def particles-range [1 2 3 4 5])
-  )
+  (def particles-range [1 2 3 4 5]))
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/particles-range</span>","value":"#'worksheets.hmm/particles-range"}
@@ -83,15 +80,14 @@ observations
 ;; **
 
 ;; @@
-(defn getImportanceResults [ num-particles ]
-  (let [raw-results (take num-particles (infer :importance hmm [observations init-dist trans-dists obs-dists] ))
-        formatted-lines (map (fn [particle] (str/join "," (cons (:log-weight particle) (:result particle))) ) raw-results)
-        nicely-formatted-results (str/join "\n" formatted-lines)
-        ]
+(defn getImportanceResults [num-particles]
+  (let [raw-results (take num-particles (infer :importance hmm [observations init-dist trans-dists obs-dists]))
+        formatted-lines (map (fn [particle] (str/join "," (cons (:log-weight particle) (:result particle)))) raw-results)
+        nicely-formatted-results (str/join "\n" formatted-lines)]
     (spit (str/join ["plots/hmm/is_1_" (str num-particles) ".csv"]) nicely-formatted-results)))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.gaussian/getImportanceResults</span>","value":"#'worksheets.gaussian/getImportanceResults"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/getImportanceResults</span>","value":"#'worksheets.hmm/getImportanceResults"}
 ;; <=
 
 ;; @@
@@ -103,14 +99,13 @@ observations
 
 ;; @@
 (defn getSMCResults [ num-particles ]
-  (let [raw-results (take num-particles (infer :smc hmm [observations init-dist trans-dists obs-dists] :number-of-particles 1000))
+  (let [raw-results (take num-particles (infer :smc hmm [observations init-dist trans-dists obs-dists] :number-of-particles num-particles))
         formatted-lines (map (fn [particle] (str/join "," (cons (:log-weight particle) (:result particle))) ) raw-results)
-        nicely-formatted-results (str/join "\n" formatted-lines)
-        ]
+        nicely-formatted-results (str/join "\n" formatted-lines)]
     (spit (str/join ["plots/hmm/smc_1_" (str num-particles) ".csv"]) nicely-formatted-results)))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.gaussian/getSMCResults</span>","value":"#'worksheets.gaussian/getSMCResults"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/getSMCResults</span>","value":"#'worksheets.hmm/getSMCResults"}
 ;; <=
 
 ;; @@
@@ -125,9 +120,9 @@ observations
 ;; **
 
 ;; @@
-(defn combine-observes-fn [ observes ] (map :value observes))
+(defn combine-observes-fn [observes] (map :value observes))
 
-(def replier (zmq/start-replier hmm [observations init-dist trans-dists obs-dists] combine-observes-fn ))
+(def replier (zmq/start-replier hmm [observations init-dist trans-dists obs-dists] combine-observes-fn))
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/replier</span>","value":"#'worksheets.hmm/replier"}
@@ -148,15 +143,14 @@ observations
 ;; <=
 
 ;; @@
-(infer :csis hmm [observations init-dist trans-dists obs-dists] )
+(infer :csis hmm [observations init-dist trans-dists obs-dists])
 ;; @@
 
 ;; @@
-(defn getCSISResults [ num-particles ]
+(defn getCSISResults [num-particles]
   (let [raw-results (take num-particles (infer :csis hmm [observations init-dist trans-dists obs-dists] ))
         formatted-lines (map (fn [particle] (str/join "," (cons (:log-weight particle) (:result particle))) ) raw-results)
-        nicely-formatted-results (str/join "\n" formatted-lines)
-        ]
+        nicely-formatted-results (str/join "\n" formatted-lines)]
     (spit (str/join ["plots/hmm/csis_1_" (str num-particles) ".csv"]) nicely-formatted-results)))
 ;; @@
 ;; =>
@@ -169,3 +163,7 @@ observations
 ;; =>
 ;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}],"value":"(nil nil nil nil nil)"}
 ;; <=
+
+;; @@
+
+;; @@
