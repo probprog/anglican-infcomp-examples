@@ -5,10 +5,10 @@
 ```
 <initial_mean>
 <initial_variance>
-<transition_matrix>
+<transition_multiplier>
 <transition_offset>
 <transition_variance>
-<emission_matrix>
+<emission_multiplier>
 <emission_offset>
 <emission_variance>
 ```
