@@ -38,7 +38,7 @@
 				observations ))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.gaussian/hmm</span>","value":"#'worksheets.gaussian/hmm"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/hmm</span>","value":"#'worksheets.hmm/hmm"}
 ;; <=
 
 ;; **
@@ -64,11 +64,18 @@
   (def init-dist init-dist)
   (def trans-dists trans-dists)
   (def obs-dists obs-dists)
-  (def particles-range [1 10 100 1000 10000])
+  (def particles-range [1 2 3 4 5])
   )
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.gaussian/particles-range</span>","value":"#'worksheets.gaussian/particles-range"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/particles-range</span>","value":"#'worksheets.hmm/particles-range"}
+;; <=
+
+;; @@
+observations
+;; @@
+;; =>
+;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-double'>0.9</span>","value":"0.9"},{"type":"html","content":"<span class='clj-double'>0.8</span>","value":"0.8"},{"type":"html","content":"<span class='clj-double'>0.7</span>","value":"0.7"},{"type":"html","content":"<span class='clj-double'>0.0</span>","value":"0.0"},{"type":"html","content":"<span class='clj-double'>-0.025</span>","value":"-0.025"},{"type":"html","content":"<span class='clj-double'>5.0</span>","value":"5.0"},{"type":"html","content":"<span class='clj-double'>2.0</span>","value":"2.0"},{"type":"html","content":"<span class='clj-double'>0.1</span>","value":"0.1"},{"type":"html","content":"<span class='clj-double'>0.0</span>","value":"0.0"},{"type":"html","content":"<span class='clj-double'>0.13</span>","value":"0.13"},{"type":"html","content":"<span class='clj-double'>0.45</span>","value":"0.45"},{"type":"html","content":"<span class='clj-double'>6.0</span>","value":"6.0"},{"type":"html","content":"<span class='clj-double'>0.2</span>","value":"0.2"},{"type":"html","content":"<span class='clj-double'>0.3</span>","value":"0.3"},{"type":"html","content":"<span class='clj-double'>-1.0</span>","value":"-1.0"},{"type":"html","content":"<span class='clj-double'>-1.0</span>","value":"-1.0"}],"value":"(0.9 0.8 0.7 0.0 -0.025 5.0 2.0 0.1 0.0 0.13 0.45 6.0 0.2 0.3 -1.0 -1.0)"}
 ;; <=
 
 ;; **
@@ -123,18 +130,25 @@
 (def replier (zmq/start-replier hmm [observations init-dist trans-dists obs-dists] combine-observes-fn ))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.gaussian/replier</span>","value":"#'worksheets.gaussian/replier"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/replier</span>","value":"#'worksheets.hmm/replier"}
 ;; <=
 
 ;; @@
 (combine-observes-fn (prior/sample-observes-from-prior hmm [observations init-dist trans-dists obs-dists]))
 ;; @@
 ;; =>
-;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-double'>1.5936254932200566</span>","value":"1.5936254932200566"},{"type":"html","content":"<span class='clj-double'>-0.8905675819828675</span>","value":"-0.8905675819828675"},{"type":"html","content":"<span class='clj-double'>-1.4835860964772203</span>","value":"-1.4835860964772203"},{"type":"html","content":"<span class='clj-double'>1.2072729253016774</span>","value":"1.2072729253016774"},{"type":"html","content":"<span class='clj-double'>1.9199742950720333</span>","value":"1.9199742950720333"},{"type":"html","content":"<span class='clj-double'>0.24701022119150806</span>","value":"0.24701022119150806"},{"type":"html","content":"<span class='clj-double'>-0.6619913700452689</span>","value":"-0.6619913700452689"},{"type":"html","content":"<span class='clj-double'>0.4280336638442295</span>","value":"0.4280336638442295"},{"type":"html","content":"<span class='clj-double'>-1.4062279853844346</span>","value":"-1.4062279853844346"},{"type":"html","content":"<span class='clj-double'>0.16200134848318748</span>","value":"0.16200134848318748"},{"type":"html","content":"<span class='clj-double'>0.965336543350232</span>","value":"0.965336543350232"},{"type":"html","content":"<span class='clj-double'>-1.9458226342558367</span>","value":"-1.9458226342558367"},{"type":"html","content":"<span class='clj-double'>-0.3003680644459726</span>","value":"-0.3003680644459726"},{"type":"html","content":"<span class='clj-double'>0.054301685553939445</span>","value":"0.054301685553939445"},{"type":"html","content":"<span class='clj-double'>-0.7661193594731306</span>","value":"-0.7661193594731306"},{"type":"html","content":"<span class='clj-double'>-0.6115797814887327</span>","value":"-0.6115797814887327"}],"value":"(1.5936254932200566 -0.8905675819828675 -1.4835860964772203 1.2072729253016774 1.9199742950720333 0.24701022119150806 -0.6619913700452689 0.4280336638442295 -1.4062279853844346 0.16200134848318748 0.965336543350232 -1.9458226342558367 -0.3003680644459726 0.054301685553939445 -0.7661193594731306 -0.6115797814887327)"}
+;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-double'>0.5544653644519333</span>","value":"0.5544653644519333"},{"type":"html","content":"<span class='clj-double'>0.9241250617946138</span>","value":"0.9241250617946138"},{"type":"html","content":"<span class='clj-double'>-0.018043199986925603</span>","value":"-0.018043199986925603"},{"type":"html","content":"<span class='clj-double'>-1.2746267085935241</span>","value":"-1.2746267085935241"},{"type":"html","content":"<span class='clj-double'>1.171554636770816</span>","value":"1.171554636770816"},{"type":"html","content":"<span class='clj-double'>1.0026099248120266</span>","value":"1.0026099248120266"},{"type":"html","content":"<span class='clj-double'>-0.5314431673708702</span>","value":"-0.5314431673708702"},{"type":"html","content":"<span class='clj-double'>-2.3164966314889757</span>","value":"-2.3164966314889757"},{"type":"html","content":"<span class='clj-double'>0.4356770569331204</span>","value":"0.4356770569331204"},{"type":"html","content":"<span class='clj-double'>1.0217609984157543</span>","value":"1.0217609984157543"},{"type":"html","content":"<span class='clj-double'>0.322195118491742</span>","value":"0.322195118491742"},{"type":"html","content":"<span class='clj-double'>-2.244892045640148</span>","value":"-2.244892045640148"},{"type":"html","content":"<span class='clj-double'>-0.28794695339796383</span>","value":"-0.28794695339796383"},{"type":"html","content":"<span class='clj-double'>0.2441162123131777</span>","value":"0.2441162123131777"},{"type":"html","content":"<span class='clj-double'>1.0673125398445473</span>","value":"1.0673125398445473"},{"type":"html","content":"<span class='clj-double'>0.567841093958255</span>","value":"0.567841093958255"}],"value":"(0.5544653644519333 0.9241250617946138 -0.018043199986925603 -1.2746267085935241 1.171554636770816 1.0026099248120266 -0.5314431673708702 -2.3164966314889757 0.4356770569331204 1.0217609984157543 0.322195118491742 -2.244892045640148 -0.28794695339796383 0.2441162123131777 1.0673125398445473 0.567841093958255)"}
 ;; <=
 
 ;; @@
 (zmq/stop-replier replier)
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-string'>&quot;ZMQ connection terminated.&quot;</span>","value":"\"ZMQ connection terminated.\""}
+;; <=
+
+;; @@
+(infer :csis hmm [observations init-dist trans-dists obs-dists] )
 ;; @@
 
 ;; @@
@@ -146,7 +160,7 @@
     (spit (str/join ["plots/hmm/csis_1_" (str num-particles) ".csv"]) nicely-formatted-results)))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.gaussian/getCSISResults</span>","value":"#'worksheets.gaussian/getCSISResults"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/getCSISResults</span>","value":"#'worksheets.hmm/getCSISResults"}
 ;; <=
 
 ;; @@
@@ -155,7 +169,3 @@
 ;; =>
 ;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}],"value":"(nil nil nil nil nil)"}
 ;; <=
-
-;; @@
-
-;; @@
