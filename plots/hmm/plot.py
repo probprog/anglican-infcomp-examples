@@ -4,10 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import hmmlearn.hmm as hmm
 import scipy as sp
-import seaborn as sns
-
-plt.style.use('seaborn-whitegrid')
-plt.style.use('seaborn-colorblind')
 
 
 def get_posterior(inference_result, num_states):
@@ -102,23 +98,24 @@ def main():
             colorbar_ax = plt.subplot(gs[:, -1], aspect=50)
 
             temp = axs[0].imshow(
-                true_posteriors[dataset_num],
-                clim=[0, 1], cmap=matplotlib.cm.Blues
+                true_posteriors[dataset_num], clim=[0, 1]
             )
             axs[0].grid(False)
             axs[0].set_ylabel('State')
             axs[0].set_title('Ground Truth', fontsize=12)
             axs[0].set_xticks([])
+            axs[0].set_yticks(range(num_states))
 
             for ax, algorithm in zip(axs[1:], args.algorithms):
                 temp = ax.imshow(
                     posteriors[dataset_num][num_particles][algorithm],
-                    clim=[0, 1], cmap=matplotlib.cm.Blues
+                    clim=[0, 1]
                 )
                 ax.grid(False)
                 ax.set_ylabel('State')
                 ax.set_title(algorithm.upper(), fontsize=12)
                 ax.set_xticks([])
+                ax.set_yticks(range(num_states))
 
             axs[-1].set_xticks(np.arange(len(data[dataset_num])))
             axs[-1].set_xlabel('Time')
@@ -138,9 +135,7 @@ def main():
     # Plot kl_{dataset_num}.pdf
     for dataset_num in args.dataset_num_list:
         fig, ax = plt.subplots(1, 1)
-        fig.suptitle('Sum of KL divergences\n{} particle{}'.format(
-            num_particles, '' if num_particles == 1 else 's'
-        ), fontsize=14)
+        fig.suptitle('Sum of KL divergences', fontsize=14)
         kls = {}
         for algorithm in args.algorithms:
             kls[algorithm] = []
@@ -157,10 +152,6 @@ def main():
         ax.set_ylabel(
             '$\sum_{t = 1}^T KL(p(x_t | y_{1:T}) || \hat p(x_t | y_{1:T}))$'
         )
-        # ax.set_xticks(args.num_particles_list)
-        ax.set_xlim(
-            np.min(args.num_particles_list), np.max(args.num_particles_list)
-        )
 
         filename = 'kl_{}.pdf'.format(dataset_num)
         fig.savefig(filename, bbox_inches='tight')
@@ -169,9 +160,7 @@ def main():
     # Plot l2_{dataset_num}.pdf
     for dataset_num in args.dataset_num_list:
         fig, ax = plt.subplots(1, 1)
-        fig.suptitle('Sum of L2 norms\n{} particle{}'.format(
-            num_particles, '' if num_particles == 1 else 's'
-        ), fontsize=14)
+        fig.suptitle('Sum of L2 norms', fontsize=14)
         l2s = {}
         for algorithm in args.algorithms:
             l2s[algorithm] = []
@@ -188,10 +177,6 @@ def main():
         ax.set_ylabel(
             '$\sum_{t = 1}^T L_2(p(x_t | y_{1:T}), \hat p(x_t | y_{1:T}))$'
         )
-        # ax.set_xticks(args.num_particles_list)
-        ax.set_xlim(
-            np.min(args.num_particles_list), np.max(args.num_particles_list)
-        )
 
         filename = 'l2_{}.pdf'.format(dataset_num)
         fig.savefig(filename, bbox_inches='tight')
@@ -200,9 +185,7 @@ def main():
     # Plot log_kl_{dataset_num}.pdf
     for dataset_num in args.dataset_num_list:
         fig, ax = plt.subplots(1, 1)
-        fig.suptitle('Sum of KL divergences\n{} particle{}'.format(
-            num_particles, '' if num_particles == 1 else 's'
-        ), fontsize=14)
+        fig.suptitle('Sum of KL divergences', fontsize=14)
         kls = {}
         for algorithm in args.algorithms:
             kls[algorithm] = []
@@ -219,10 +202,6 @@ def main():
         ax.set_ylabel(
             '$\sum_{t = 1}^T KL(p(x_t | y_{1:T}) || \hat p(x_t | y_{1:T}))$'
         )
-        # ax.set_xticks(args.num_particles_list)
-        ax.set_xlim(
-            np.min(args.num_particles_list), np.max(args.num_particles_list)
-        )
 
         filename = 'log_kl_{}.pdf'.format(dataset_num)
         fig.savefig(filename, bbox_inches='tight')
@@ -231,9 +210,7 @@ def main():
     # Plot log_l2_{dataset_num}.pdf
     for dataset_num in args.dataset_num_list:
         fig, ax = plt.subplots(1, 1)
-        fig.suptitle('Sum of L2 norms\n{} particle{}'.format(
-            num_particles, '' if num_particles == 1 else 's'
-        ), fontsize=14)
+        fig.suptitle('Sum of L2 norms', fontsize=14)
         l2s = {}
         for algorithm in args.algorithms:
             l2s[algorithm] = []
@@ -249,10 +226,6 @@ def main():
         ax.set_xlabel('Number of particles')
         ax.set_ylabel(
             '$\sum_{t = 1}^T L_2(p(x_t | y_{1:T}), \hat p(x_t | y_{1:T}))$'
-        )
-        # ax.set_xticks(args.num_particles_list)
-        ax.set_xlim(
-            np.min(args.num_particles_list), np.max(args.num_particles_list)
         )
 
         filename = 'log_l2_{}.pdf'.format(dataset_num)
