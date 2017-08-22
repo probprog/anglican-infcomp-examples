@@ -1,7 +1,7 @@
 ;; gorilla-repl.fileformat = 1
 
 ;; @@
-(ns worksheets.gaussian
+(ns worksheets.hmm
   (:require [anglican.runtime :refer :all]
             [anglican.emit :refer [defquery]]
             [anglican.stat :as stat]
@@ -24,6 +24,8 @@
 ;; **
 
 ;; @@
+(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
+
 ( defquery hmm
 	[ observations init-dist trans-dists obs-dists ]
 	( reduce
@@ -150,6 +152,9 @@
 ;; @@
 (map getCSISResults particles-range)
 ;; @@
+;; =>
+;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}],"value":"(nil nil nil nil nil)"}
+;; <=
 
 ;; @@
 
