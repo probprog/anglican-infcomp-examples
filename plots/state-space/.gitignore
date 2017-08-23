@@ -1,2 +1,5 @@
 .ipynb_checkpoints/
 Untitled.ipynb
+csis_*.csv
+is_*.csv
+smc_*.csv
