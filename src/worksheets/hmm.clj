@@ -40,6 +40,9 @@
     []
     observations))
 ;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/hmm</span>","value":"#'worksheets.hmm/hmm"}
+;; <=
 
 ;; **
 ;;; Gather the parameters and data from the file:
@@ -57,6 +60,9 @@
                     2 (discrete (nth model 3))})
   (def obs-dists (apply hash-map (flatten (mapv vector (range 3) (mapv #(normal %1 %2) (nth model 4) (nth model 5)))))))
 ;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/obs-dists</span>","value":"#'worksheets.hmm/obs-dists"}
+;; <=
 
 ;; **
 ;;; Start the compiler:
@@ -87,12 +93,19 @@
                     "is" :importance
                     "smc" :smc
                     "csis" :csis)
-        states (take num-particles (infer algorithm hmm [observations init-dist trans-dists obs-dists]))
+        algorithm-options (case algorithm-name
+                            "is" []
+                            "smc" [:number-of-particles num-particles]
+                            "csis" [])
+        states (take num-particles (apply infer algorithm hmm [observations init-dist trans-dists obs-dists] algorithm-options))
         inference-result-string (str/join
                                   "\n"
                                   (map (fn [state] (str/join "," (cons (:log-weight state) (:result state)))) states))]
     (spit (str "plots/hmm/" algorithm-name "_1_" num-particles ".csv") inference-result-string)))
 ;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/print-inference-results</span>","value":"#'worksheets.hmm/print-inference-results"}
+;; <=
 
 ;; @@
 (def particles-range [10 100 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000])
@@ -102,7 +115,7 @@
 (mapv #(print-inference-results % "smc") particles-range)
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/particles-range</span>","value":"#'worksheets.hmm/particles-range"}
+;;; {"type":"list-like","open":"<span class='clj-vector'>[</span>","close":"<span class='clj-vector'>]</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}],"value":"[nil nil nil nil nil nil nil nil nil nil nil nil]"}
 ;; <=
 
 ;; @@
