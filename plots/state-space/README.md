@@ -3,14 +3,7 @@
 - `model.csv` contains the model specification in the form of
 
 ```
-<initial_mean>
-<initial_variance>
-<transition_multiplier>
-<transition_offset>
-<transition_variance>
-<emission_multiplier>
-<emission_offset>
-<emission_variance>
+<initial_mean>,<initial_variance>,<transition_multiplier>,<transition_offset>,<transition_variance>,<emission_multiplier>,<emission_offset>,<emission_variance>
 ```
 
 - `data_{dataset_num}.csv` contains an observation sequence in the form
@@ -30,5 +23,3 @@
 - `inference_{dataset_num}_{num_particles}.pdf` contains the plots of posterior state space for different inference algorithms
 
 - `kl_{dataset_num}.pdf` contains the plots of KL versus number of particles
-
-- `l2_{dataset_num}.pdf` contains the plots of L2 error
