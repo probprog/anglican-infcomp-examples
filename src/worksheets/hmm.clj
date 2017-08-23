@@ -95,23 +95,23 @@
                     "csis" :csis)
         states (take num-particles (infer algorithm hmm [observations init-dist trans-dists obs-dists]))
         inference-result-string (str/join
-                                  (map (fn [state] (str/join "," (cons (:log-weight state) (:result state)))) states)
-                                  "\n")]
+                                  "\n"
+                                  (map (fn [state] (str/join "," (cons (:log-weight state) (:result state)))) states))]
     (spit (str "plots/hmm/" algorithm-name "_1_" num-particles ".csv") inference-result-string)))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/print-results</span>","value":"#'worksheets.hmm/print-results"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/print-inference-results</span>","value":"#'worksheets.hmm/print-inference-results"}
 ;; <=
 
 ;; @@
 (def particles-range [1 2 3 4 5])
 
-(map #(print-inference-results % "csis") particles-range)
-(map #(print-inference-results % "is") particles-range)
-(map #(print-inference-results % "smc") particles-range)
+(mapv #(print-inference-results % "csis") particles-range)
+(mapv #(print-inference-results % "is") particles-range)
+(mapv #(print-inference-results % "smc") particles-range)
 ;; @@
 ;; =>
-;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}],"value":"(nil nil nil nil nil)"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/particles-range</span>","value":"#'worksheets.hmm/particles-range"}
 ;; <=
 
 ;; @@
