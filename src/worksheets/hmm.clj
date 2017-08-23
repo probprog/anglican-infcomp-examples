@@ -40,9 +40,6 @@
     []
     observations))
 ;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/hmm</span>","value":"#'worksheets.hmm/hmm"}
-;; <=
 
 ;; **
 ;;; Gather the parameters and data from the file:
@@ -60,9 +57,6 @@
                     2 (discrete (nth model 3))})
   (def obs-dists (apply hash-map (flatten (mapv vector (range 3) (mapv #(normal %1 %2) (nth model 4) (nth model 5)))))))
 ;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/obs-dists</span>","value":"#'worksheets.hmm/obs-dists"}
-;; <=
 
 ;; **
 ;;; Start the compiler:
@@ -99,12 +93,9 @@
                                   (map (fn [state] (str/join "," (cons (:log-weight state) (:result state)))) states))]
     (spit (str "plots/hmm/" algorithm-name "_1_" num-particles ".csv") inference-result-string)))
 ;; @@
-;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.hmm/print-inference-results</span>","value":"#'worksheets.hmm/print-inference-results"}
-;; <=
 
 ;; @@
-(def particles-range [1 2 3 4 5])
+(def particles-range [10 100 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000])
 
 (mapv #(print-inference-results % "csis") particles-range)
 (mapv #(print-inference-results % "is") particles-range)
