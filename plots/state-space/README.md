@@ -3,14 +3,7 @@
 - `model.csv` contains the model specification in the form of
 
 ```
-<initial_mean>
-<initial_variance>
-<transition_multiplier>
-<transition_offset>
-<transition_variance>
-<emission_multiplier>
-<emission_offset>
-<emission_variance>
+<initial_mean>,<initial_variance>,<transition_multiplier>,<transition_offset>,<transition_variance>,<emission_multiplier>,<emission_offset>,<emission_variance>
 ```
 
 - `data_{dataset_num}.csv` contains an observation sequence in the form
