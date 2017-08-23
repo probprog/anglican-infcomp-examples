@@ -30,5 +30,3 @@
 - `inference_{dataset_num}_{num_particles}.pdf` contains the plots of posterior state space for different inference algorithms
 
 - `kl_{dataset_num}.pdf` contains the plots of KL versus number of particles
-
-- `l2_{dataset_num}.pdf` contains the plots of L2 error
