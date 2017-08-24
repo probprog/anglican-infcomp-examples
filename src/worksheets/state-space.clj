@@ -35,8 +35,8 @@
     (fn [states obs]
       (let [state (if (empty? states)
                     (sample init-dist)
-                    (sample (normal (+ trans-offset (* trans-mult (peek states))) trans-var)))]
-        (observe (normal (+ obs-offset (* obs-mult state)) obs-var) obs)
+                    (sample (normal (+ trans-offset (* trans-mult (peek states))) (sqrt trans-var))))]
+        (observe (normal (+ obs-offset (* obs-mult state)) (sqrt obs-var)) obs)
         (conj states state)))
     []
     observations))
@@ -50,7 +50,7 @@
 ;; **
 
 ;; @@
-(def dataset 12)
+(def dataset 1)
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.state-space/dataset</span>","value":"#'worksheets.state-space/dataset"}
@@ -108,7 +108,7 @@
 (map #(print-inference-results % "smc" dataset) particles-range)
 ;; @@
 ;; =>
-;;; {"type":"list-like","open":"<span class='clj-lazy-seq'>(</span>","close":"<span class='clj-lazy-seq'>)</span>","separator":" ","items":[{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"},{"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}],"value":"(nil nil nil nil nil nil nil nil nil)"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.state-space/particles-range</span>","value":"#'worksheets.state-space/particles-range"}
 ;; <=
 
 ;; @@
