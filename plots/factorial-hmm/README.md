@@ -29,9 +29,9 @@ where states can be either 0 or 1 and
 - `{algorithm}_{dataset_num}_{num_particles}.csv` contains inference result in the form of `{num_particles}` lines where `{algorithm}` is one of `is, smc, csis`:
 
 ```
-<unnormalized_log_weight>,<state_1_1>,...,<state_1_{num_timesteps}>,<state_2_1>,...,<state_2_{num_timesteps}>,......,<state_{num_features}_1>,...,<state_{num_features}_{num_timesteps}>
+<unnormalized_log_weight>,<state_1_1>,...,<state_1_{num_features}>,<state_2_1>,...,<state_2_{num_features}>,......,<state_{num_timesteps}_1>,...,<state_{num_timesteps}_{num_features}>
 ...
-<unnormalized_log_weight>,<state_1_1>,...,<state_1_{num_timesteps}>,<state_2_1>,...,<state_2_{num_timesteps}>,......,<state_{num_features}_1>,...,<state_{num_features}_{num_timesteps}>
+<unnormalized_log_weight>,<state_1_1>,...,<state_1_{num_features}>,<state_2_1>,...,<state_2_{num_features}>,......,<state_{num_timesteps}_1>,...,<state_{num_timesteps}_{num_features}>
 ```
 
 - `inference_{dataset_num}_{num_particles}.pdf` contains the plots of posterior state space for different inference algorithms

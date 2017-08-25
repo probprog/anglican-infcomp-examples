@@ -56,32 +56,6 @@ def empirical_variance(particle_values, normalized_weights):
     ) - empirical_mean(particle_values, normalized_weights)**2
 
 
-def get_sum_kl1(means_1, variances_1, means_2, variances_2, epsilon=1e-10):
-    return np.sum(
-        0.5 * (np.log(variances_2 + epsilon) - np.log(variances_1 + epsilon)) +
-        (variances_1 + (means_1 - means_2)**2) / (2 * variances_2 + epsilon) -
-        0.5
-    )
-
-
-def get_sum_kl2(
-    particle_values, normalized_weights, means, variances, epsilon=1e-10
-):
-    num_timesteps = len(means)
-    result = 0
-    for time in range(num_timesteps):
-        result += np.sum(normalized_weights * (
-            np.log(normalized_weights + epsilon) -
-            scipy.stats.norm.logpdf(
-                particle_values[:, time],
-                loc=means[time],
-                scale=np.sqrt(variances[time])
-            )
-        ))
-
-    return result
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset-num-list', nargs='+', type=int,
@@ -264,62 +238,6 @@ def main():
 
         filename = 'meanvarl2_{}.pdf'.format(dataset_num)
 
-        fig.tight_layout(rect=[0, 0, 1, 0.92])
-        fig.savefig(filename, bbox_inches='tight')
-        plt.close(fig)
-        print('\nPlot saved to {}'.format(filename))
-
-    # # Plot kl1_{dataset_num}_{num_particles}.pdf
-    # for dataset_num in args.dataset_num_list:
-    #     fig, ax = plt.subplots(1, 1)
-    #     fig.suptitle('Sum of KL divergences (1)\nDataset {}'.format(
-    #         dataset_num
-    #     ), fontsize=14)
-    #     for algorithm in args.algorithms:
-    #         kl = []
-    #         for num_particles in args.num_particles_list:
-    #             kl.append(get_sum_kl1(
-    #                 true_state_means[dataset_num],
-    #                 true_state_variances[dataset_num],
-    #                 posterior_means[dataset_num][num_particles][algorithm],
-    #                 posterior_variances[dataset_num][num_particles][algorithm]
-    #             ))
-    #
-    #         ax.plot(args.num_particles_list, kl, label=algorithm)
-    #
-    #     ax.legend()
-    #     ax.set_xlabel('Number of particles')
-    #     ax.set_ylabel('$\sum_{t = 1}^T KL\\left(p(x_t | y_{1:T})\,||\,\mathrm{Normal}(\hat \mu_t, \hat \sigma_t^2)\\right)$')
-    #     filename = 'kl1_{}.pdf'.format(dataset_num)
-    #     fig.savefig(filename, bbox_inches='tight')
-    #     print('\nPlot saved to {}'.format(filename))
-
-    # Plot kl2_{dataset_num}_{num_particles}.pdf and
-    # kl2log_{dataset_num}_{num_particles}.pdf
-    for dataset_num in args.dataset_num_list:
-        fig, ax = plt.subplots(1, 1)
-        fig.suptitle('Sum of KL divergences (2)\nDataset {}'.format(
-            dataset_num
-        ), fontsize=14)
-
-        for algorithm in args.algorithms:
-            kl = []
-            for num_particles in args.num_particles_list:
-                kl.append(get_sum_kl2(
-                    particle_values[dataset_num][num_particles][algorithm],
-                    normalized_weights[dataset_num][num_particles][algorithm],
-                    true_state_means[dataset_num],
-                    true_state_variances[dataset_num]
-                ))
-
-            ax.plot(args.num_particles_list, kl, label=algorithm)
-
-        ax.legend()
-        ax.set_xlabel('Number of particles')
-        ax.set_xlabel('Number of particles')
-        ax.set_ylabel('$\sum_{t = 1}^T KL\\left(\sum_{k = 1}^K w^k \delta_{x_t^k}(x_t) \,||\, p(x_t | y_{1:T})\\right)$')
-
-        filename = 'kl2_{}.pdf'.format(dataset_num)
         fig.tight_layout(rect=[0, 0, 1, 0.92])
         fig.savefig(filename, bbox_inches='tight')
         plt.close(fig)
