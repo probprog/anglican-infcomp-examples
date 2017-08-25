@@ -6,6 +6,7 @@
                  [anglican "1.1.0-SNAPSHOT"]
                  [anglican-infcomp "0.2.2-SNAPSHOT"]
                  [net.polyc0l0r/clj-hdf5 "0.2.2-SNAPSHOT"]
-                 [rhizome "0.2.7"]]
+                 [rhizome "0.2.7"]
+                 [org.clojure/data.priority-map "0.0.7"]]
   :java-source-paths ["src/helpers"]
   :main anglican-infcomp-examples.core)
