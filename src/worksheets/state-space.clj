@@ -50,7 +50,7 @@
 ;; **
 
 ;; @@
-(def dataset 1)
+(def dataset 12)
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.state-space/dataset</span>","value":"#'worksheets.state-space/dataset"}
@@ -82,6 +82,7 @@
 
 ;; @@
 (defn print-inference-results [num-particles algorithm-name dataset_no]
+  (assert (* (read-string (str (last (str dataset)))) 10) (count observations))	; check that observations is the expected length
   (let [algorithm (case algorithm-name
                     "is" :importance
                     "smc" :smc
@@ -101,7 +102,7 @@
 ;; <=
 
 ;; @@
-(def particles-range [10 100 1000 2000 3000 4000 6000 7000 8000 9000 10000])
+(def particles-range [10 100 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000])
 
 (map #(print-inference-results % "csis" dataset) particles-range)
 (map #(print-inference-results % "is" dataset) particles-range)
