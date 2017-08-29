@@ -18,36 +18,80 @@
             anglican.smc
             anglican.infcomp.csis
             anglican.importance
-            anglican.infcomp.core))
+            anglican.infcomp.core
+            [clojure.data.priority-map :refer [priority-map]]))
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-nil'>nil</span>","value":"nil"}
 ;; <=
 
 ;; @@
-(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
+; Dijkstra algorithm from: https://gist.github.com/ummels/86c09182dee25b142280
+(defn map-vals [m f]
+  (into {} (for [[k v] m] [k (f v)])))
 
-(defn policy [current-position desired-position world]
+(defn remove-keys [m pred]
+  (select-keys m (filter (complement pred) (keys m))))
+
+(defn dijkstra
+  "Computes single-source shortest path distances in a directed graph.
+
+  Given a node n, (f n) should return a map with the successors of n
+  as keys and their (non-negative) distance from n as vals.
+
+  Returns a map from nodes to their distance from start."
+  [start f]
+  (loop [q (priority-map start 0) r {}]
+    (if-let [[v d] (peek q)]
+      (let [dist (-> (f v) (remove-keys r) (map-vals (partial + d)))]
+        (recur (merge-with min (pop q) dist) (assoc r v d)))
+      r)))
+
+(def WALL 1)
+(defn get-neighbors
+  "returns a list of neighbors of position"
+  [position world]
+  (filter (fn [[row col]]
+            (and (> row 0)
+                 (< row (m/row-count world))
+                 (> col 0)
+                 (< col (m/column-count world))
+                 (not= (get-in world [row col]) WALL)))
+          (map #(m/add position %) [[1 0] [0 1] [-1 0] [0 -1]])))
+
+; https://stackoverflow.com/questions/8815772/how-can-i-find-the-index-of-the-smallest-member-of-this-vector-in-clojure
+(defn argmin [v]
+  (first (apply min-key second (map-indexed vector v))))
+
+(defn policy [position desired-position world]
+  (let [f #(apply hash-map (flatten (map vector (get-neighbors % world) (repeat 1))))
+        distance-map (dijkstra desired-position f)
+        neighbors (get-neighbors position)
+        distances-of-neighbors-to-desired-position (map distance-map neighbors)]
+    (nth neighbors (argmin distances-of-neighbors-to-desired-position))))
+
+#_(defn policy [current-position desired-position world]
   (let [required-movement (map - desired-position current-position)]
     (map #(int (+ % 0.5)) (map #(/ % (reduce + required-movement)) required-movement))))
 
+(anglican.infcomp.core/reset-infcomp-addressing-scheme!)
 (with-primitive-procedures [policy m/identity-matrix]
-(defquery agents [ observed-positions world initial-position ]
-  (let [desired-position [(sample (uniform-discrete 0 (count world))) (sample (uniform-discrete 0 (count (first world))))]]
-    (reduce
-      (fn [ positions obs ]
-  	  	(let [ current-position (peek positions)
-  	       	  step (policy current-position desired-position world) ]
-          (println positions)
-          (observe (mvn current-position [[1 0][0 1]]) obs)
-          (println "successfully observed")
-          (conj positions (map + current-position step))
-          ))
-      [initial-position]
-      observed-positions)
+  (defquery agents [ observed-positions world initial-position ]
+    (let [desired-position [(sample (uniform-discrete 0 (count world))) (sample (uniform-discrete 0 (count (first world))))]]
+      (reduce
+        (fn [ positions obs ]
+          (let [ current-position (peek positions)
+                 step (policy current-position desired-position world) ]
+            (println positions)
+            (observe (mvn current-position [[1 0][0 1]]) obs)
+            (println "successfully observed")
+            (conj positions (map + current-position step))
+            ))
+        [initial-position]
+        observed-positions)
+      )
     )
   )
-)
 ;; @@
 ;; =>
 ;;; {"type":"html","content":"<span class='clj-var'>#&#x27;worksheets.agents/agents</span>","value":"#'worksheets.agents/agents"}
@@ -55,10 +99,10 @@
 
 ;; @@
 (def world [[0 0 0 0 0 0]
-            [0 0 0 0 0 0]
-            [0 0 0 0 0 0]
-            [0 0 0 0 0 0]
-            [0 0 0 0 0 0]
+            [0 0 1 0 0 0]
+            [0 0 1 0 0 0]
+            [0 0 1 0 0 0]
+            [0 0 1 0 0 0]
             [0 0 0 0 0 0]
             [0 0 0 0 0 0]] )
 ;; @@
