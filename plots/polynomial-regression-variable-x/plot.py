@@ -75,7 +75,7 @@ def plot(num_dataset, particles_range):
         X = [float(i) for i in file.readline().rstrip().split(",")]
         Y = [float(i) for i in file.readline().rstrip().split(",")]
     
-    true_x, true_y = plotQuadratic(true_weights)
+    true_x, true_y = plotQuadratic(true_weights, [X[0]-1, X[-1]+1])
     fig, ax = plt.subplots(len(particles_range), 3)
     
     #fig.suptitle(algorithm + " on dataset " + str(num_dataset))
@@ -97,11 +97,13 @@ def plot(num_dataset, particles_range):
                     w2.append(line[3])
             weights = normalize_weights(log_weights)
             mean_weights = [empirical_mean(i, weights) for i in [w0, w1, w2]]
-            mean_x, mean_y = plotQuadratic(mean_weights)
-            current_ax.plot(mean_x, mean_y, 'b--')
+            mean_x, mean_y = plotQuadratic(mean_weights, [X[0]-1, X[-1]+1])
+            current_ax.set_xlim(X[0]-1, X[-1]+1)
+            current_ax.set_ylim(min(Y)*1.1-max(Y)*0.1, max(Y)*1.1-min(Y)*0.1)
+            #current_ax.plot(mean_x, mean_y, 'b--')
             for particle in range(len(w0)):
-                particle_x, particle_y = plotQuadratic([w0[particle],w1[particle],w2[particle]])
-                current_ax.plot(particle_x, particle_y, 'b', alpha=5/len(w0))
+                particle_x, particle_y = plotQuadratic([w0[particle],w1[particle],w2[particle]], [X[0]-1, X[-1]+1])
+                current_ax.plot(particle_x, particle_y, 'b', alpha=min(1, 5*weights[particle]))
     
     for i in range(len(particles_range)):
         ax[i, 0].set_ylabel(str(particles_range[i]) + " particles")
@@ -114,5 +116,5 @@ def plot(num_dataset, particles_range):
 
 if __name__ == "__main__":
     for dataset in [1,2,3]:
-        for particles_range in [[10,20,40],[80,160,320]]:
+        for particles_range in [[10,20,40],[80,160,320],[640,1280,2560]]:
             plot(dataset, particles_range)

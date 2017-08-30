@@ -13,9 +13,9 @@
 - `{algorithm}_{dataset_num}_{num_particles}.csv` contains inference result in the form of `{num_particles}` lines where `{algorithm}` is one of `is, smc, csis`:
 
 ```
-<unnormalized_log_weight>,<latent_1>,...,<latent_{num_timesteps}>
+<unnormalized_log_weight>,<w0>,<w1>,<w2>
 ...
-<unnormalized_log_weight>,<latent_1>,...,<latent_{num_timesteps}>
+<unnormalized_log_weight>,<w0>,<w1>,<w2>
 ```
 
-- `inference_{algorithm}_{dataset_num}_{num_particles}.pdf` shows outputs from weights proposed by {algorithm} for dataset {dataset_num} with {num_particles} particles
+- `inference_{dataset_num}_{num_particles_1}_{num_particles_2}_{num_particles_3}.pdf` shows plots from weights proposed by each of CSIS, SMC and importance sampling for dataset {dataset_num} for each of the 3 numbers of particles - the opacity of each particle is weighted using the given log-weight
