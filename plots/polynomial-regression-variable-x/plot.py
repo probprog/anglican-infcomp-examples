@@ -54,21 +54,65 @@ def empirical_variance(particle_values, normalized_weights):
         particle_values, normalized_weights, lambda x: x**2
     ) - empirical_mean(particle_values, normalized_weights)**2
 
-def plot(algorithm, num_dataset, num_particles):
+def normalize_weights(log_weights):
+    weights = np.exp(log_weights)
+    norm = sum(weights)
+    return [i/norm for i in weights]
+
+def quadratic(w, x):
+    """"Returns mapping of a single x-value to a polynomial with w = [w0,w1,w2]"""
+    return w[0]+w[1]*x+w[2]*x**2
+
+def plotQuadratic(w, xrange = [-10, 10]):
+    X = np.arange(xrange[0], xrange[1], 0.1)
+    Y = [quadratic(w,x) for x in X]
+    return (X,Y)
+
+def plot(num_dataset, particles_range):
     """ Plots the contents of the specified file, as described in the README """
-    filename = "inference_" + algorithm + "_" + str(num_dataset) + "_" + str(num_particles) + ".pdf"
     with open("data_" + str(num_dataset) + ".csv") as file:
-        true_weights = map(float, file.readline().rstrip().split(","))
+        true_weights = [float(i) for i in file.readline().rstrip().split(",")]
         X = [float(i) for i in file.readline().rstrip().split(",")]
         Y = [float(i) for i in file.readline().rstrip().split(",")]
-        
-        
-    fig, ax = plt.subplots(1, 1)
-    fig.suptitle(str(num_particles))
+    
+    true_x, true_y = plotQuadratic(true_weights)
+    fig, ax = plt.subplots(len(particles_range), 3)
+    
+    #fig.suptitle(algorithm + " on dataset " + str(num_dataset))
+    
+    for column in range(3):
+        for subplot_no in range(len(particles_range)):
+            num_particles = particles_range[subplot_no]
+            current_ax = ax[subplot_no,column]
+            current_ax.plot(true_x, true_y, 'k')
+            current_ax.plot(X, Y, 'k*')
+            
+            log_weights, w0, w1, w2 = [], [], [], []
+            with open(["csis", "smc", "is"][column] + "_" + str(num_dataset) + "_" + str(num_particles) + ".csv") as predictions:
+                for line in predictions:
+                    line = [float(i) for i in line.split(",")]
+                    log_weights.append(line[0])
+                    w0.append(line[1])
+                    w1.append(line[2])
+                    w2.append(line[3])
+            weights = normalize_weights(log_weights)
+            mean_weights = [empirical_mean(i, weights) for i in [w0, w1, w2]]
+            mean_x, mean_y = plotQuadratic(mean_weights)
+            current_ax.plot(mean_x, mean_y, 'b--')
+            for particle in range(len(w0)):
+                particle_x, particle_y = plotQuadratic([w0[particle],w1[particle],w2[particle]])
+                current_ax.plot(particle_x, particle_y, 'b', alpha=5/len(w0))
+    
+    for i in range(len(particles_range)):
+        ax[i, 0].set_ylabel(str(particles_range[i]) + " particles")
+    for i in range(3):
+        ax[0,i].set_title(["CSIS", "SMC", "Importance"][i])
+    
+    fig.tight_layout()
+    filename = "inference_" + str(num_dataset) + "_" + "_".join([str(i) for i in particles_range]) + ".pdf"
     fig.savefig(filename, bbox_inches='tight')
-        
-    with open(algorithm + '_' + str(num_dataset) + '_' + str(num_particles) + ".csv") as file:
-        pass
 
 if __name__ == "__main__":
-    plot("csis", 1, 10)
+    for dataset in [1,2,3]:
+        for particles_range in [[10,20,40],[80,160,320]]:
+            plot(dataset, particles_range)
