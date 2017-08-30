@@ -114,7 +114,7 @@ def plot(num_dataset, particles_range):
     filename = "inference_" + str(num_dataset) + "_" + "_".join([str(i) for i in particles_range]) + ".pdf"
     fig.savefig(filename, bbox_inches='tight')
     
-def plotError(num_dataset, particles_range):
+def plotError(num_dataset, particles_range, log=False):
     with open("data_" + str(num_dataset) + "_test.csv") as file:
         file.readline()
         X = [float(i) for i in file.readline().rstrip().split(",")]
@@ -136,14 +136,20 @@ def plotError(num_dataset, particles_range):
             predicted_Y = np.array([quadratic(predicted_weights, x) for x in X])
             errors[algorithm].append(sum([i**2 for i in predicted_Y - test_Y])/len(test_Y))
     for algorithm in errors:
-        plt.semilogx(particles_range, errors[algorithm], label = algorithm)
+        if log:
+            plt.loglog(particles_range, errors[algorithm], label = algorithm)
+        else:
+            plt.semilogx(particles_range, errors[algorithm], label = algorithm)
         plt.xlabel("Number of Particles")
         plt.ylabel("Mean Squared Error of Predictions")
     plt.legend()
-    plt.savefig("test_error_" + str(num_dataset) + ".pdf")
+    if log:
+        plt.savefig("test_log_error_" + str(num_dataset) + ".pdf")
+    else:
+        plt.savefig("test_error_" + str(num_dataset) + ".pdf")
 
 if __name__ == "__main__":
-    plotError(3, [10,20,40,80,160,320,640,1280,2560])
+    plotError(1, [10,20,40,80,160,320,640,1280,2560], True)
     #for dataset in [1,2,3]:
     #    for particles_range in [[10,20,40],[80,160,320],[640,1280,2560]]:
     #        plot(dataset, particles_range)
