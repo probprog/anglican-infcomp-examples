@@ -76,7 +76,7 @@ def plot(num_dataset, particles_range):
         Y = [float(i) for i in file.readline().rstrip().split(",")]
     
     true_x, true_y = plotQuadratic(true_weights, [X[0]-1, X[-1]+1])
-    fig, ax = plt.subplots(len(particles_range), 3)
+    fig, ax = plt.subplots(len(particles_range), 3, sharex = True, sharey = True)
     
     #fig.suptitle(algorithm + " on dataset " + str(num_dataset))
     
@@ -113,8 +113,34 @@ def plot(num_dataset, particles_range):
     fig.tight_layout()
     filename = "inference_" + str(num_dataset) + "_" + "_".join([str(i) for i in particles_range]) + ".pdf"
     fig.savefig(filename, bbox_inches='tight')
+    
+def plotError(num_dataset, particles_range):
+    with open("data_" + str(num_dataset) + ".csv") as file:
+        true_weights = [float(i) for i in file.readline().rstrip().split(",")]
+    errors = {}
+    for algorithm in ["csis", "smc", "is"]:
+        errors[algorithm] = []
+        for num_particles in particles_range:
+            log_weights, w0, w1, w2 = [], [], [], []
+            with open(algorithm + "_" + str(num_dataset) + "_" + str(num_particles) + ".csv") as predictions:
+                for line in predictions:
+                    line = [float(i) for i in line.split(",")]
+                    log_weights.append(line[0])
+                    w0.append(line[1])
+                    w1.append(line[2])
+                    w2.append(line[3])
+            weights = normalize_weights(log_weights)
+            predicted_weights = np.array([empirical_mean(i, weights) for i in [w0, w1, w2]])
+            errors[algorithm].append(np.linalg.norm(predicted_weights - true_weights))
+    for algorithm in errors:
+        plt.semilogx(particles_range, errors[algorithm], label = algorithm)
+        plt.xlabel("Number of Particles")
+        plt.ylabel("Error of Empirical Mean of Weights")
+    plt.legend()
+    plt.savefig("l2_" + str(num_dataset) + ".pdf")
 
 if __name__ == "__main__":
-    for dataset in [1,2,3]:
-        for particles_range in [[10,20,40],[80,160,320],[640,1280,2560]]:
-            plot(dataset, particles_range)
+    plotError(3, [10,20,40,80,160,320,640,1280,2560])
+    #for dataset in [1,2,3]:
+    #    for particles_range in [[10,20,40],[80,160,320],[640,1280,2560]]:
+    #        plot(dataset, particles_range)
