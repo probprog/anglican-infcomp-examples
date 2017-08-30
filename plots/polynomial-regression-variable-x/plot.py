@@ -134,14 +134,13 @@ def plotError(num_dataset, particles_range):
             weights = normalize_weights(log_weights)
             predicted_weights = np.array([empirical_mean(i, weights) for i in [w0, w1, w2]])
             predicted_Y = np.array([quadratic(predicted_weights, x) for x in X])
-            print(predicted_Y-test_Y)
-            #errors[algorithm].append(np.linalg.norm(predicted_weights - true_weights))
-    #for algorithm in errors:
-    #    plt.semilogx(particles_range, errors[algorithm], label = algorithm)
-    #    plt.xlabel("Number of Particles")
-    #    plt.ylabel("Error of Empirical Mean of Weights")
-    #plt.legend()
-    #plt.savefig("l2_" + str(num_dataset) + ".pdf")
+            errors[algorithm].append(sum([i**2 for i in predicted_Y - test_Y])/len(test_Y))
+    for algorithm in errors:
+        plt.semilogx(particles_range, errors[algorithm], label = algorithm)
+        plt.xlabel("Number of Particles")
+        plt.ylabel("Mean Squared Error of Predictions")
+    plt.legend()
+    plt.savefig("test_error_" + str(num_dataset) + ".pdf")
 
 if __name__ == "__main__":
     plotError(3, [10,20,40,80,160,320,640,1280,2560])
