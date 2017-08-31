@@ -1,3 +1,6 @@
+;; gorilla-repl.fileformat = 1
+
+;; @@
 (ns anglican-infcomp-examples.core
   (:gen-class)
   (:require [clojure.edn :as edn]
@@ -66,6 +69,10 @@
 
    ["-Y" "--infer-observe-embedder-input-value <clojure value>" "INFER: Input to the observe embedder"
     :parse-fn edn/read-string]
+   
+   ["-P" "--infer-query-args <string>" "INFER: Path to the file containing the query arguments"]
+   
+   ["-F" "--infer-query-args-getter <variable name>" "INFER: Name of a function to extract query arguments from file"]
 
    ["-A" "--infer-query-args <variable name>" "INFER: Name of the variable storing the query arguments for inference"]
 
@@ -254,3 +261,5 @@ lein run -- \\
   [& args]
   (apply main args)
   (shutdown-agents))
+
+;; @@
