@@ -70,14 +70,18 @@
    ["-Y" "--infer-observe-embedder-input-value <clojure value>" "INFER: Input to the observe embedder"
     :parse-fn edn/read-string]
    
-   ["-P" "--infer-query-args <string>" "INFER: Path to the file containing the query arguments"]
+   ["-F" "--infer-observe-embedder-input-operation <string>" "INFER: Name of a function to transform the query arguments to give the observe embedder input"]
    
-   ["-F" "--infer-query-args-getter <variable name>" "INFER: Name of a function to extract query arguments from file"]
+   ["-P" "--infer-query-args-path <string>" "INFER: Path to the file containing the query arguments"]
+   
+   ["-G" "--infer-query-args-getter <variable name>" "INFER: Name of a function to extract query arguments from file"]
 
    ["-A" "--infer-query-args <variable name>" "INFER: Name of the variable storing the query arguments for inference"]
 
    ["-Z" "--infer-query-args-value <value>" "INFER: Query arguments for inference"
     :parse-fn edn/read-string]
+   
+   ["-O" "--infer-output-path <string>" "INFER: Path to a file to dump the output"]
 
    ["-d" "--debug" "debug"]])
 
@@ -213,12 +217,18 @@ lein run -- \\
                  (println (str "Compilation server started at " endpoint)))))
 
            ;; Infer
-           (let [query-args (if (:infer-query-args options)
-                              (load-var ns-name (:infer-query-args options))
-                              (:infer-query-args-value options))
-                 observe-embedder-input (if (:infer-observe-embedder-input options)
-                                          (load-var ns-name (:infer-observe-embedder-input options))
-                                          (:infer-observe-embedder-input-value options))
+           (let [query-args (cond
+                              (:infer-query-args-path options) ((load-var ns-name (:infer-query-args-getter options)) (:infer-query-args-path options))
+                              (:infer-query-args options) (load-var ns-name (:infer-query-args options))
+                              (:infer-query-args-value options) (:infer-query-args-value options)
+                              :else nil)
+                 
+                 observe-embedder-input (cond
+                              			  (:infer-observe-embedder-input options) (load-var ns-name (:infer-observe-embedder-input options))
+                              			  (:infer-observe-embedder-input-value options) (:infer-observe-embedder-input-value options)
+                              			  (:infer-observe-embedder-input-operation options) ((load-var ns-name (:infer-observe-embedder-input-operation options)) query-args)
+                                          :else nil)
+                 
                  endpoint (:infer-endpoint options)
                  num-samples (:infer-number-of-samples options)
                  states (infer :csis
@@ -247,8 +257,10 @@ lein run -- \\
                         (str (apply str (take 77 (str observe-embedder-input))) "...")
                         "nil")
                       num-samples))
-             (mapv #(println (str (get-result %) "," (get-log-weight %)))
-                   (take num-samples states)))))
+             (if (:infer-output-path options)
+               (spit (:infer-output-path options) (str/join "\n" (map #(str (str/join "," (:result %)) "," (:log-weight %)) (take num-samples states))))
+               (mapv #(println (str (get-result %) "," (get-log-weight %)))
+                   (take num-samples states))))))
        ;; Otherwise, could not load the query.
        (catch Exception e
          (binding [*out* *err*]
@@ -261,5 +273,12 @@ lein run -- \\
   [& args]
   (apply main args)
   (shutdown-agents))
+
+;; @@
+;; =>
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;anglican-infcomp-examples.core/-main</span>","value":"#'anglican-infcomp-examples.core/-main"}
+;; <=
+
+;; @@
 
 ;; @@

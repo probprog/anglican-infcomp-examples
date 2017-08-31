@@ -37,19 +37,19 @@
         Y (take count_x (drop count_x (rest mess)))]
     (mapv #(vector %1 %2) X Y)))
 
-(def replier (zmq/start-replier polynomial-regression [(repeat 10 0) (repeat 10 0)] combine-observes-fn))
-
-(defn getData [file-path]
+(defn get-data [file-path]
   (let [file (map #(into [] (map read-string (str/split % #","))) (str/split (slurp file-path) #"\n"))
         x (nth file 0)
         y (nth file 1)]
     [x y]))
 
+(def compile-args [(repeat 10 0) (repeat 10 0)])
+
+(defn create-obs-emb-input [args]
+  (let [x (first args)
+        y (second args)]
+    (mapv #(vector %1 %2) x y)))
 ;; @@
 ;; =>
-;;; {"type":"html","content":"<span class='clj-var'>#&#x27;queries.polynomial-regression/getData</span>","value":"#'queries.polynomial-regression/getData"}
+;;; {"type":"html","content":"<span class='clj-var'>#&#x27;queries.polynomial-regression/create-obs-emb-input</span>","value":"#'queries.polynomial-regression/create-obs-emb-input"}
 ;; <=
-
-;; @@
-
-;; @@
